@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Riverty card: future-state journey</title>
+<style>
+:root{--bg:#f7f9f9;--surface:#fff;--ink:#12302e;--muted:#4f6664;--line:#cfdcda;--accent:#0f6e56;--tint:#e1f5ee}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1a19;--surface:#162423;--ink:#e3efed;--muted:#9fb5b2;--line:#2a3e3c;--accent:#5dcaa5;--tint:#123a33}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:1100px;margin:0 auto;padding:32px 20px 48px}
+h1{font-size:26px;margin:0 0 6px;font-weight:600}
+.note{color:var(--muted);font-size:13px;margin:0 0 20px}
+.brief p{margin:4px 0}
+.brief b{font-weight:600}
+ol.track{list-style:none;margin:28px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:16px;position:relative}
+ol.track::before{content:"";position:absolute;left:12.5%;right:12.5%;top:16px;border-top:2px solid var(--line)}
+.stage{position:relative}
+.dot{position:relative;display:grid;place-items:center;width:34px;height:34px;margin:0 auto 12px;border-radius:50%;background:var(--accent);color:var(--bg);font-weight:600}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;height:calc(100% - 46px)}
+.card h2{font-size:17px;margin:0 0 10px;font-weight:600}
+.card dt{font-size:12px;color:var(--muted);margin-top:10px}
+.card dd{margin:2px 0 0;font-size:14px}
+h3{font-size:18px;margin:36px 0 8px;font-weight:600}
+li.adv{margin:6px 0}
+.risk{background:var(--tint);border-left:3px solid var(--accent);padding:10px 14px;margin-top:28px;font-size:14px}
+@media (max-width:820px){ol.track{grid-template-columns:1fr}ol.track::before{display:none}.card{height:auto}}
+</style>
+</head>
+<body>
+<main>
+<h1>Riverty card: future-state journey</h1>
+<p class="note">Sample data, illustrative, not Riverty research. References (T-xxx, N-xx) point to the fictional data pack. Internal states and the manual workaround are inference.</p>
+<div class="brief">
+<p><b>Persona:</b> A heavy BNPL user who runs two or more pay later apps and checks them before payday.</p>
+<p><b>Goal:</b> See in one place what they owe in total, and when, before payday.</p>
+<p><b>Strategy:</b> One place to see and pay everything owed, in-store as well as online, so users stop checking several apps or falling back on their debit card.</p>
+</div>
+
+<ol class="track">
+<li class="stage"><div class="dot">1</div><div class="card"><h2>Get set up</h2><dl>
+<dt>User action</dt><dd>Adds card to phone wallet from approval screen &rarr; pays in-store same day.</dd>
+<dt>Internal state</dt><dd>Feels cautious about one more app &rarr; reassured by simple setup.</dd>
+<dt>Pain point addressed</dt><dd>Fixing wallet failure (T-102) and ID retries (T-106) &rarr; fewer users give up.</dd></dl></div></li>
+<li class="stage"><div class="dot">2</div><div class="card"><h2>Pay anywhere</h2><dl>
+<dt>User action</dt><dd>Taps card in shop or online &rarr; pays without reaching for debit card.</dd>
+<dt>Internal state</dt><dd>Feels confident, no second thoughts &rarr; uses the card by habit.</dd>
+<dt>Pain point addressed</dt><dd>Silent declines (T-101, N-06) &rarr; user stays with card, not debit.</dd></dl></div></li>
+<li class="stage"><div class="dot">3</div><div class="card"><h2>See it all</h2><dl>
+<dt>User action</dt><dd>Opens one screen with card and pay later totals &rarr; sees total owed.</dd>
+<dt>Internal state</dt><dd>Feels in control &rarr; stops checking other apps.</dd>
+<dt>Pain point addressed</dt><dd>Two screens, two totals (T-103, N-07) &rarr; one trusted number.</dd></dl></div></li>
+<li class="stage"><div class="dot">4</div><div class="card"><h2>Settle up</h2><dl>
+<dt>User action</dt><dd>Gets one reminder with one amount and due date &rarr; pays on time without doubt.</dd>
+<dt>Internal state</dt><dd>Feels relieved &rarr; trusts Riverty as the place to manage payments.</dd>
+<dt>Pain point addressed</dt><dd>Two reminders, different amounts (T-104) &rarr; no confusion over what is due.</dd></dl></div></li>
+</ol>
+
+<h3>3 competitive advantages over the manual workaround</h3>
+<ol>
+<li class="adv">One in-app total replaces app-hopping and copying &rarr; faster, trusted answer before payday.</li>
+<li class="adv">Declines explained in the app &rarr; user retries instead of falling back to debit.</li>
+<li class="adv">One due date and one reminder &rarr; no reconciling conflicting amounts by hand.</li>
+</ol>
+
+<div class="risk"><b>Risk to flag early:</b> Stages 3 and 4 need card and pay later to share one balance and one due date (B3, B8). That is a platform and regulatory dependency, and N-11 says approvals take months. Confirm feasibility with engineering and risk before committing.</div>
+</main>
+</body>
+</html>
