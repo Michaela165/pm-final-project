@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Add to wallet prototype · BU Pay &amp; Credit</title>
+<style>
+  :root {
+    --ink: #12232d;
+    --muted: #5b6b76;
+    --line: #d6dde2;
+    --bg: #eef2f4;
+    --surface: #ffffff;
+    --accent: #0b5d4b;
+    --accent-ink: #ffffff;
+    --warn-bg: #fdecec;
+    --warn-ink: #8a1f1f;
+    --ok-bg: #dff3e8;
+    --ok-ink: #0d5a30;
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Segoe UI", system-ui, -apple-system, Helvetica, Arial, sans-serif;
+    line-height: 1.45;
+    padding: 24px 16px 40px;
+  }
+  h1 { font-size: 1.15rem; margin: 0 0 4px; }
+  .sub { margin: 0 0 20px; color: var(--muted); font-size: 0.9rem; max-width: 70ch; }
+  .stage { display: flex; flex-wrap: wrap; gap: 24px; justify-content: center; align-items: flex-start; max-width: 960px; margin: 0 auto; }
+
+  /* phone */
+  .phone {
+    width: 375px; height: 667px; flex: none;
+    background: var(--surface);
+    border: 10px solid #1d2b34;
+    border-radius: 36px;
+    overflow: hidden;
+    position: relative;
+    box-sizing: content-box;
+  }
+  .screen { position: absolute; inset: 0; padding: 28px 24px 24px; display: none; flex-direction: column; }
+  .screen.active { display: flex; }
+  .top { flex: 1; display: flex; flex-direction: column; }
+  .actions { display: flex; flex-direction: column; gap: 10px; }
+  h2 { font-size: 1.45rem; line-height: 1.2; margin: 18px 0 8px; }
+  p { margin: 0 0 10px; }
+  .hint { color: var(--muted); font-size: 0.95rem; }
+
+  .card {
+    background: linear-gradient(135deg, #0f3b4a, #0b5d4b);
+    color: #fff; border-radius: 16px; padding: 18px; height: 150px;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .card .brand { font-weight: 700; letter-spacing: 0.02em; }
+  .card .num { font-size: 1.15rem; letter-spacing: 0.12em; }
+  .card .row { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; }
+  .pill { background: rgba(255,255,255,0.18); border-radius: 999px; padding: 2px 10px; font-size: 0.78rem; }
+
+  button { font: inherit; cursor: pointer; }
+  .primary {
+    background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 12px;
+    padding: 15px 16px; font-weight: 650; font-size: 1.02rem; width: 100%;
+  }
+  .primary:hover { filter: brightness(1.08); }
+  .link { background: none; border: 0; color: var(--accent); text-decoration: underline; padding: 10px; font-size: 0.98rem; }
+  button:focus-visible, select:focus-visible { outline: 3px solid #2563eb; outline-offset: 2px; }
+
+  .center { align-items: center; text-align: center; justify-content: center; }
+  .spinner { width: 54px; height: 54px; border: 5px solid var(--line); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.9s linear infinite; margin: 0 auto 18px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .spinner { animation: none; border-top-color: var(--line); } }
+  .badge { width: 60px; height: 60px; border-radius: 50%; display: grid; place-items: center; font-size: 1.9rem; font-weight: 700; margin: 0 auto 14px; }
+  .badge.ok { background: var(--ok-bg); color: var(--ok-ink); }
+  .badge.bad { background: var(--warn-bg); color: var(--warn-ink); }
+  .note { background: #f1f5f7; border-radius: 10px; padding: 12px 14px; font-size: 0.93rem; color: var(--ink); }
+  .foot { font-size: 0.72rem; color: var(--muted); text-align: center; margin-top: 10px; }
+  .hidden { display: none !important; }
+
+  /* reviewer panel */
+  .panel { width: 360px; max-width: 100%; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+  .panel h3 { margin: 0 0 8px; font-size: 0.95rem; }
+  .panel label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 4px; }
+  select { width: 100%; padding: 8px; font: inherit; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--ink); }
+  .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 14px 0; }
+  .metric { background: #f1f5f7; border-radius: 8px; padding: 8px 10px; }
+  .metric b { display: block; font-size: 1.1rem; }
+  .metric span { font-size: 0.78rem; color: var(--muted); }
+  .metric.pass b { color: var(--ok-ink); }
+  .metric.fail b { color: var(--warn-ink); }
+  ol.log { margin: 0; padding: 0; list-style: none; max-height: 220px; overflow: auto; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.78rem; border-top: 1px solid var(--line); }
+  ol.log li { padding: 5px 2px; border-bottom: 1px solid var(--line); display: flex; gap: 8px; }
+  ol.log li .t { color: var(--muted); flex: none; width: 46px; }
+  .empty { color: var(--muted); padding: 8px 2px; font-size: 0.82rem; }
+  .small { font-size: 0.78rem; color: var(--muted); margin-top: 12px; }
+  .restart { margin-top: 12px; width: 100%; padding: 9px; border: 1px solid var(--line); background: #fff; border-radius: 8px; color: var(--ink); }
+</style>
+</head>
+<body>
+<h1>Add to wallet: prototype</h1>
+<p class="sub">Simulated flow for the PRD "Add to phone wallet from the approval screen". No real wallet, no network, fictional data. The panel on the right is a reviewer tool, not product UI.</p>
+
+<div class="stage">
+  <!-- PHONE -->
+  <div class="phone" aria-label="Phone screen">
+
+    <!-- Screen 1: entry point -->
+    <section class="screen active" id="s-approval" aria-labelledby="h-approval">
+      <div class="top">
+        <div class="card" aria-label="Riverty Card ending 4821">
+          <div class="row"><span class="brand">Riverty Card</span><span class="pill">Approved</span></div>
+          <div class="num">•••• 4821</div>
+          <div class="row"><span>Lena M.</span><span>Debit-style</span></div>
+        </div>
+        <h2 id="h-approval">You're approved</h2>
+        <p class="hint">Tap to pay in shops. Online orders work without it.</p>
+        <div class="note hidden" id="blocked-note" role="status"></div>
+      </div>
+      <div class="actions">
+        <button class="primary" id="btn-add" type="button">Add to wallet</button>
+        <button class="link" id="btn-skip" type="button">Skip for now</button>
+        <div class="foot">Prototype · fictional data</div>
+      </div>
+    </section>
+
+    <!-- Screen 2: feature core -->
+    <section class="screen" id="s-adding" aria-live="polite">
+      <div class="top center" id="adding-progress">
+        <div class="spinner" aria-hidden="true"></div>
+        <h2>Adding your card</h2>
+        <p class="hint">This takes a few seconds.</p>
+        <button class="link" id="btn-cancel" type="button">Cancel</button>
+      </div>
+      <div class="top center hidden" id="adding-failed">
+        <div class="badge bad" aria-hidden="true">!</div>
+        <h2>Couldn't add your card</h2>
+        <p class="hint" id="fail-reason"></p>
+        <p class="hint" id="fail-count"></p>
+      </div>
+      <div class="actions hidden" id="fail-actions">
+        <button class="primary" id="btn-retry" type="button">Try again</button>
+        <button class="link" id="btn-later" type="button">Add later</button>
+      </div>
+    </section>
+
+    <!-- Screen 3: success -->
+    <section class="screen" id="s-success" aria-labelledby="h-success">
+      <div class="top">
+        <div class="card" aria-label="Riverty Card in wallet">
+          <div class="row"><span class="brand">Riverty Card</span><span class="pill">In wallet</span></div>
+          <div class="num">•••• 4821</div>
+          <div class="row"><span>Lena M.</span><span>Ready to tap</span></div>
+        </div>
+        <div class="badge ok" style="margin-top:22px" aria-hidden="true">✓</div>
+        <h2 id="h-success" style="text-align:center">Your card is in your wallet</h2>
+        <p class="hint" style="text-align:center">Hold your phone to the reader to pay.</p>
+      </div>
+      <div class="actions">
+        <button class="primary" id="btn-go" type="button">Go to my card</button>
+        <div class="foot">Prototype · fictional data</div>
+      </div>
+    </section>
+
+    <!-- Stub destination (not one of the 3 built screens) -->
+    <section class="screen" id="s-home" aria-labelledby="h-home">
+      <div class="top center">
+        <h2 id="h-home">Card home</h2>
+        <p class="hint">Placeholder. This screen is outside the prototype scope.</p>
+        <p class="note" id="home-status"></p>
+      </div>
+      <div class="actions">
+        <button class="primary" id="btn-restart-phone" type="button">Restart flow</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- REVIEWER PANEL -->
+  <aside class="panel" aria-label="Reviewer tools">
+    <h3>Reviewer tools</h3>
+    <label for="scenario">Scenario (restarts the flow)</label>
+    <select id="scenario">
+      <option value="success">Success</option>
+      <option value="timeout">Connection lost (no response, 3 s timeout)</option>
+      <option value="declined">Wallet app declines every time</option>
+      <option value="flaky">Fails twice, then succeeds</option>
+      <option value="unsupported">Device not supported</option>
+      <option value="already">Card already in wallet</option>
+    </select>
+
+    <div class="metrics">
+      <div class="metric" id="m-taps"><b>-</b><span>Taps to success (FR-2: 3 or fewer)</span></div>
+      <div class="metric" id="m-time"><b>-</b><span>Seconds on task (includes reading)</span></div>
+    </div>
+
+    <h3>Event list (FR-7, in memory)</h3>
+    <ol class="log" id="log" aria-live="polite"></ol>
+    <div class="empty" id="log-empty">No events yet.</div>
+
+    <button class="restart" id="btn-restart" type="button">Restart and clear events</button>
+    <p class="small">Seconds on task is a usability check with internal testers. It says nothing about the live wallet add rate (baseline 66.8%).</p>
+  </aside>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var REASONS = {
+    connection_lost:      { code: "connection_lost",      text: "Your connection dropped before the card was added." },
+    wallet_declined:      { code: "wallet_declined",      text: "Your wallet app didn't accept the request." },
+    device_not_supported: { code: "device_not_supported", text: "This phone can't hold the card in a wallet." }
+  };
+  var MAX_ATTEMPTS = 3;
+  var TIMEOUT_MS = 3000;
+
+  var state = {};
+  var timers = [];
+  var events = [];
+
+  function $(id) { return document.getElementById(id); }
+  var screens = { approval: $("s-approval"), adding: $("s-adding"), success: $("s-success"), home: $("s-home") };
+
+  function clearTimers() { timers.forEach(clearTimeout); timers = []; }
+  function later(fn, ms) { timers.push(setTimeout(fn, ms)); }
+
+  function now() { return Date.now(); }
+  function secs(ms) { return (ms / 1000).toFixed(1); }
+
+  function log(name, detail) {
+    var t = state.t0 ? now() - state.t0 : 0;
+    events.push({ t: t, name: name, detail: detail || "" });
+    drawLog();
+  }
+
+  function drawLog() {
+    var ol = $("log");
+    ol.textContent = "";
+    events.forEach(function (e) {
+      var li = document.createElement("li");
+      var t = document.createElement("span"); t.className = "t"; t.textContent = secs(e.t) + "s";
+      var n = document.createElement("span"); n.textContent = e.name + (e.detail ? " (" + e.detail + ")" : "");
+      li.appendChild(t); li.appendChild(n); ol.appendChild(li);
+    });
+    $("log-empty").classList.toggle("hidden", events.length > 0);
+    ol.scrollTop = ol.scrollHeight;
+  }
+
+  function show(name) {
+    Object.keys(screens).forEach(function (k) { screens[k].classList.toggle("active", k === name); });
+    state.screen = name;
+  }
+
+  function tap() { state.taps += 1; }
+
+  function drawMetrics(done) {
+    var mt = $("m-taps"), mm = $("m-time");
+    mt.className = "metric"; mm.className = "metric";
+    if (!done) {
+      mt.querySelector("b").textContent = state.taps ? String(state.taps) : "-";
+      mm.querySelector("b").textContent = "-";
+      return;
+    }
+    mt.querySelector("b").textContent = String(state.taps);
+    mt.classList.add(state.taps <= 3 ? "pass" : "fail");
+    mm.querySelector("b").textContent = secs(state.tSuccess - state.t0);
+  }
+
+  function reset() {
+    clearTimers();
+    state = { screen: "approval", attempts: 0, taps: 0, busy: false, inWallet: false, t0: now(), tSuccess: 0, scenario: $("scenario").value };
+    events = [];
+    drawLog();
+    drawMetrics(false);
+    renderApproval();
+  }
+
+  /* Screen 1 */
+  function renderApproval() {
+    show("approval");
+    var sc = state.scenario;
+    var note = $("blocked-note");
+    var add = $("btn-add");
+    if (sc === "unsupported" || sc === "already") {
+      add.classList.add("hidden");
+      note.classList.remove("hidden");
+      note.textContent = sc === "unsupported"
+        ? "This phone can't hold the card in a wallet. Your card works online."
+        : "Your card is already in your wallet.";
+      $("btn-skip").textContent = "Continue";
+      log("shown", "button hidden: " + (sc === "unsupported" ? REASONS.device_not_supported.code : "already_added"));
+    } else {
+      add.classList.remove("hidden");
+      note.classList.add("hidden");
+      $("btn-skip").textContent = "Skip for now";
+      log("shown", "button visible");
+    }
+  }
+
+  /* Screen 2 */
+  function showProgress() {
+    show("adding");
+    $("adding-progress").classList.remove("hidden");
+    $("adding-failed").classList.add("hidden");
+    $("fail-actions").classList.add("hidden");
+  }
+
+  function showFailure(reasonKey) {
+    var r = REASONS[reasonKey];
+    show("adding");
+    $("adding-progress").classList.add("hidden");
+    $("adding-failed").classList.remove("hidden");
+    $("fail-actions").classList.remove("hidden");
+    $("fail-reason").textContent = r.text;
+    var left = MAX_ATTEMPTS - state.attempts;
+    var retry = $("btn-retry");
+    if (left > 0) {
+      retry.classList.remove("hidden");
+      $("btn-later").textContent = "Add later";
+      $("fail-count").textContent = "";
+    } else {
+      retry.classList.add("hidden");
+      $("btn-later").textContent = "Add later from the card screen";
+      $("fail-count").textContent = "We tried " + MAX_ATTEMPTS + " times. You can add it later.";
+    }
+    $("btn-later").className = left > 0 ? "link" : "primary";
+  }
+
+  function startAdd() {
+    if (state.busy) return;            // ignore double taps
+    state.busy = true;
+    state.attempts += 1;
+    var attempt = state.attempts;
+    log("tapped", "attempt " + attempt);
+    showProgress();
+    log("started");
+
+    // Watchdog: progress never runs past 3 seconds
+    later(function () { if (state.busy) fail("connection_lost"); }, TIMEOUT_MS);
+
+    var sc = state.scenario;
+    if (sc === "success") later(succeed, 1200);
+    else if (sc === "declined") later(function () { fail("wallet_declined"); }, 900);
+    else if (sc === "flaky") later(function () { attempt < 3 ? fail("connection_lost") : succeed(); }, attempt < 3 ? 900 : 1200);
+    // "timeout": no response, the watchdog fires
+  }
+
+  function fail(reasonKey) {
+    if (!state.busy) return;
+    clearTimers();
+    state.busy = false;
+    log("failed", REASONS[reasonKey].code + ", attempt " + state.attempts);
+    showFailure(reasonKey);
+  }
+
+  function succeed() {
+    if (!state.busy) return;
+    clearTimers();
+    state.busy = false;
+    state.inWallet = true;
+    state.tSuccess = now();
+    log("succeeded", "attempt " + state.attempts);
+    show("success");
+    drawMetrics(true);
+  }
+
+  /* Exits */
+  function toHome(abandonedWhere) {
+    clearTimers();
+    state.busy = false;
+    if (abandonedWhere) log("abandoned", abandonedWhere);
+    $("home-status").textContent = state.inWallet || state.scenario === "already"
+      ? "Wallet: card added. Online orders also work."
+      : "Wallet: not added. Your card works for online orders.";
+    show("home");
+  }
+
+  $("btn-add").addEventListener("click", function () { if (state.busy) return; tap(); startAdd(); });
+  $("btn-retry").addEventListener("click", function () { if (state.busy) return; tap(); startAdd(); });
+  $("btn-skip").addEventListener("click", function () {
+    tap();
+    var blocked = state.scenario === "unsupported" || state.scenario === "already";
+    toHome(blocked ? null : "screen 1, skipped");
+  });
+  $("btn-cancel").addEventListener("click", function () { tap(); toHome("screen 2, left during progress"); });
+  $("btn-later").addEventListener("click", function () { tap(); toHome("screen 2, add later"); });
+  $("btn-go").addEventListener("click", function () { tap(); toHome(null); });
+  $("btn-restart").addEventListener("click", reset);
+  $("btn-restart-phone").addEventListener("click", reset);
+  $("scenario").addEventListener("change", reset);
+
+  reset();
+})();
+</script>
+</body>
+</html>
