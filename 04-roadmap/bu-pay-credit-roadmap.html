@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BU Pay &amp; Credit: Consumer card roadmap</title>
+<style>
+  :root {
+    --bg: #f3f5f7;
+    --surface: #ffffff;
+    --ink: #14202b;
+    --muted: #556270;
+    --line: #d5dce3;
+    --navy: #0f2a3d;
+    --qw-bg: #d9f1e3; --qw-ink: #0d5a30;
+    --mp-bg: #dbe8fb; --mp-ink: #123f86;
+    --fi-bg: #fdf0c9; --fi-ink: #6b4a00;
+    --ts-bg: #f9dcdc; --ts-ink: #8a1f1f;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0e151b;
+      --surface: #17212a;
+      --ink: #e8eef3;
+      --muted: #9aa8b5;
+      --line: #2b3945;
+      --navy: #06101a;
+      --qw-bg: #14402a; --qw-ink: #9fe3bb;
+      --mp-bg: #172f57; --mp-ink: #a9c8f7;
+      --fi-bg: #4a3a0c; --fi-ink: #f1d587;
+      --ts-bg: #4d1f1f; --ts-ink: #f3b4b4;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0e151b;
+    --surface: #17212a;
+    --ink: #e8eef3;
+    --muted: #9aa8b5;
+    --line: #2b3945;
+    --navy: #06101a;
+    --qw-bg: #14402a; --qw-ink: #9fe3bb;
+    --mp-bg: #172f57; --mp-ink: #a9c8f7;
+    --fi-bg: #4a3a0c; --fi-ink: #f1d587;
+    --ts-bg: #4d1f1f; --ts-ink: #f3b4b4;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Segoe UI", system-ui, -apple-system, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+  }
+  header {
+    background: var(--navy);
+    color: #fff;
+    padding: 28px clamp(16px, 4vw, 48px) 24px;
+  }
+  header h1 { margin: 0 0 4px; font-size: clamp(1.4rem, 2.6vw, 2rem); font-weight: 650; letter-spacing: -0.01em; }
+  header p { margin: 0; color: #b9c8d6; font-size: 0.95rem; max-width: 70ch; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 14px; font-size: 0.85rem; color: #d7e2ec; }
+  .meta span b { color: #fff; font-weight: 600; }
+
+  main { padding: 24px clamp(16px, 4vw, 48px) 48px; max-width: 1400px; margin: 0 auto; }
+
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 20px; }
+  .toolbar .label { font-size: 0.85rem; color: var(--muted); margin-right: 4px; }
+  .chip {
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+    padding: 6px 12px; border-radius: 999px; font: inherit; font-size: 0.85rem; cursor: pointer;
+  }
+  .chip[aria-pressed="true"] { background: var(--navy); color: #fff; border-color: var(--navy); }
+  .chip:focus-visible, .card button:focus-visible, .theme:focus-visible { outline: 3px solid #3b82f6; outline-offset: 2px; }
+  .theme { margin-left: auto; }
+
+  .lanes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: start; }
+  @media (max-width: 900px) { .lanes { grid-template-columns: 1fr; } }
+
+  .lane { background: color-mix(in srgb, var(--surface) 55%, var(--bg)); border: 1px solid var(--line); border-radius: 10px; padding: 14px; min-height: 120px; }
+  .lane-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 4px; }
+  .lane-head h2 { margin: 0; font-size: 1.05rem; font-weight: 700; letter-spacing: 0.02em; }
+  .lane-head .count { font-size: 0.8rem; color: var(--muted); }
+  .lane-sub { margin: 0 0 12px; font-size: 0.82rem; color: var(--muted); }
+  .lane.now { border-top: 4px solid #1f9d55; }
+  .lane.next { border-top: 4px solid #2563eb; }
+  .lane.later { border-top: 4px solid #8b98a5; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+    padding: 14px; margin-bottom: 12px;
+  }
+  .card.hidden { display: none; }
+  .card-top { display: flex; gap: 10px; align-items: flex-start; justify-content: space-between; }
+  .card h3 { margin: 0; font-size: 1rem; font-weight: 650; line-height: 1.3; }
+  .card h3 .id { color: var(--muted); font-weight: 600; margin-right: 6px; }
+  .badge { flex: none; font-size: 0.75rem; font-weight: 650; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+  .qw { background: var(--qw-bg); color: var(--qw-ink); }
+  .mp { background: var(--mp-bg); color: var(--mp-ink); }
+  .fi { background: var(--fi-bg); color: var(--fi-ink); }
+  .ts { background: var(--ts-bg); color: var(--ts-ink); }
+  .scores { display: flex; gap: 14px; margin: 8px 0 0; font-size: 0.8rem; color: var(--muted); }
+  .scores b { color: var(--ink); }
+  .card p.why { margin: 10px 0 0; font-size: 0.9rem; color: var(--ink); }
+  .card button {
+    margin-top: 10px; border: 0; background: none; padding: 0; color: var(--mp-ink);
+    font: inherit; font-size: 0.82rem; cursor: pointer; text-decoration: underline;
+  }
+  .card .clamp { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .empty { font-size: 0.88rem; color: var(--muted); border: 1px dashed var(--line); border-radius: 8px; padding: 14px; }
+
+  .cut { margin-top: 32px; }
+  .cut h2 { margin: 0 0 4px; font-size: 1.1rem; }
+  .cut > p { margin: 0 0 14px; color: var(--muted); font-size: 0.9rem; }
+  .cut-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+  .cut .card { margin: 0; border-style: dashed; }
+
+  .legend { margin-top: 32px; display: flex; flex-wrap: wrap; gap: 10px 18px; font-size: 0.82rem; color: var(--muted); align-items: center; }
+  .notes { margin-top: 20px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); font-size: 0.85rem; color: var(--muted); }
+  .notes ul { margin: 6px 0 0; padding-left: 18px; }
+  .notes li { margin-bottom: 4px; }
+  .notes b { color: var(--ink); }
+</style>
+</head>
+<body>
+<header>
+  <h1>BU Pay &amp; Credit: consumer card roadmap</h1>
+  <p>First consumer card in Germany, scoped to a friends-and-family test launch. Prioritised on Lena's core friction, not on Sales or Engineering preference.</p>
+  <div class="meta">
+    <span><b>Team:</b> 1 squad, about 5 engineers (assumption)</span>
+    <span><b>Window:</b> 12 weeks (assumption)</span>
+    <span><b>Primary metric:</b> in-store decline rate, 8.7% in Month 4</span>
+    <span><b>Guardrail:</b> month-1 retention at or above 64%</span>
+  </div>
+</header>
+
+<main>
+  <div class="toolbar" role="group" aria-label="Filter by quadrant">
+    <span class="label">Show:</span>
+    <button class="chip" data-filter="all" aria-pressed="true">All</button>
+    <button class="chip" data-filter="qw" aria-pressed="false">Quick Win</button>
+    <button class="chip" data-filter="mp" aria-pressed="false">Major Project</button>
+    <button class="chip" data-filter="fi" aria-pressed="false">Fill-In</button>
+    <button class="chip" data-filter="ts" aria-pressed="false">Time Sinker</button>
+    <button class="chip theme" id="themeBtn" aria-pressed="false">Toggle dark mode</button>
+  </div>
+
+  <section class="lanes" aria-label="Roadmap lanes">
+    <div class="lane now" id="lane-now">
+      <div class="lane-head"><h2>NOW</h2><span class="count" data-count></span></div>
+      <p class="lane-sub">This sprint</p>
+    </div>
+    <div class="lane next" id="lane-next">
+      <div class="lane-head"><h2>NEXT</h2><span class="count" data-count></span></div>
+      <p class="lane-sub">The following sprints</p>
+    </div>
+    <div class="lane later" id="lane-later">
+      <div class="lane-head"><h2>LATER</h2><span class="count" data-count></span></div>
+      <p class="lane-sub">Backlog</p>
+    </div>
+  </section>
+
+  <section class="cut" aria-labelledby="cut-title">
+    <h2 id="cut-title">Cut list</h2>
+    <p>Not in this test launch. Each item stays cut unless the evidence changes.</p>
+    <div class="cut-grid" id="lane-cut"></div>
+  </section>
+
+  <div class="legend" aria-label="Quadrant legend">
+    <span class="badge qw">Quick Win</span> high value, low effort
+    <span class="badge mp">Major Project</span> high value, high effort
+    <span class="badge fi">Fill-In</span> low value, low effort
+    <span class="badge ts">Time Sinker</span> low value, high effort
+  </div>
+
+  <div class="notes">
+    <b>Read before committing</b>
+    <ul>
+      <li>Value and effort scores are PM judgment, not data. Effort has no engineering estimate yet.</li>
+      <li>B1 assumes decline codes are available to the app. This is not verified.</li>
+      <li>B1 and B2 target the in-store decline rate. B3 and B4 target the split-balance and due-date friction (N-07, T-103, T-104) and will not move that metric, so they need their own success signal.</li>
+      <li>Evidence comes from the fictional practice data pack (sample data, not Riverty research).</li>
+    </ul>
+  </div>
+</main>
+
+<script>
+  var FEATURES = [
+    { id: "B1", name: "Decline reason and retry hint in the app", lane: "now", q: "qw", value: 5, effort: 2,
+      why: "It hits the primary metric and N-06\u2019s churn moment directly (T-101, 8.7% in-store declines in Month 4). It assumes decline codes are available to the app, which I haven\u2019t verified." },
+    { id: "B2", name: "Add to phone wallet from the approval screen", lane: "now", q: "qw", value: 4, effort: 2,
+      why: "143 activated cards never reached the wallet (T-102, 66.8% baseline). No wallet means no in-store use, so it is a precondition for the in-store pitch." },
+    { id: "B3", name: "One balance view for card and pay later orders", lane: "next", q: "mp", value: 5, effort: 4,
+      why: "It is Lena\u2019s stated moment of misery (N-07, T-103). It needs a unified ledger across two products, so it is a big build." },
+    { id: "B4", name: "One due date for card and pay later orders", lane: "next", q: "mp", value: 4, effort: 4,
+      why: "It fixes the two same-week reminders for different amounts (T-104). It likely changes terms and credit policy, so it needs approval. A single combined reminder is a cheaper variant to test first." },
+    { id: "B5", name: "Choose pay now or pay later per purchase, after paying", lane: "cut", q: "ts", value: 2, effort: 4,
+      why: "It fits Lena\u2019s \u201Cmoney leaves after I keep it\u201D need. But instalments are only 15-18% of purchases, T-105 shows confusion rather than demand, and it needs per-purchase credit decisioning plus approval." },
+    { id: "B6", name: "Partner offers in the card app", lane: "cut", q: "ts", value: 2, effort: 4,
+      why: "It\u2019s the merchant-side story (N-09), but not Lena\u2019s friction, and it needs merchant integrations. Revisit it for brief Q3, not for this test." },
+    { id: "B7", name: "Cashback on every purchase", lane: "cut", q: "ts", value: 2, effort: 4,
+      why: "N-12 says it drives a first try, not continued use. It costs margin and needs pricing approval. It does nothing for declines or retention." },
+    { id: "B8", name: "Physical card", lane: "cut", q: "ts", value: 1, effort: 4,
+      why: "N-03 taps a bank card by habit. The wallet (B2) already covers in-store tapping, and a physical card adds production and logistics." }
+  ];
+
+  var QLABEL = { qw: "Quick Win", mp: "Major Project", fi: "Fill-In", ts: "Time Sinker" };
+
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text !== undefined) n.textContent = text;
+    return n;
+  }
+
+  function buildCard(f) {
+    var card = el("article", "card");
+    card.dataset.q = f.q;
+
+    var top = el("div", "card-top");
+    var h = el("h3");
+    h.appendChild(el("span", "id", f.id));
+    h.appendChild(document.createTextNode(f.name));
+    top.appendChild(h);
+    top.appendChild(el("span", "badge " + f.q, QLABEL[f.q]));
+    card.appendChild(top);
+
+    var scores = el("div", "scores");
+    var v = el("span"); v.innerHTML = "Value <b></b>/5"; v.querySelector("b").textContent = f.value;
+    var e = el("span"); e.innerHTML = "Effort <b></b>/5"; e.querySelector("b").textContent = f.effort;
+    scores.appendChild(v); scores.appendChild(e);
+    card.appendChild(scores);
+
+    var why = el("p", "why clamp", f.why);
+    card.appendChild(why);
+
+    var btn = el("button", null, "Show full rationale");
+    btn.type = "button";
+    btn.setAttribute("aria-expanded", "false");
+    btn.addEventListener("click", function () {
+      var open = why.classList.toggle("clamp") === false;
+      btn.textContent = open ? "Show less" : "Show full rationale";
+      btn.setAttribute("aria-expanded", String(open));
+    });
+    card.appendChild(btn);
+    return card;
+  }
+
+  function render() {
+    ["now", "next", "later", "cut"].forEach(function (lane) {
+      var host = document.getElementById("lane-" + lane);
+      var items = FEATURES.filter(function (f) { return f.lane === lane; });
+      if (items.length === 0 && lane === "later") {
+        host.appendChild(el("div", "empty", "Nothing parked here yet. Cut items return here only if the evidence changes."));
+      }
+      items.forEach(function (f) { host.appendChild(buildCard(f)); });
+    });
+    updateCounts();
+  }
+
+  function updateCounts() {
+    document.querySelectorAll(".lane").forEach(function (lane) {
+      var n = lane.querySelectorAll(".card:not(.hidden)").length;
+      lane.querySelector("[data-count]").textContent = n + (n === 1 ? " item" : " items");
+    });
+  }
+
+  function applyFilter(key) {
+    document.querySelectorAll(".chip[data-filter]").forEach(function (c) {
+      c.setAttribute("aria-pressed", String(c.dataset.filter === key));
+    });
+    document.querySelectorAll(".card").forEach(function (card) {
+      card.classList.toggle("hidden", key !== "all" && card.dataset.q !== key);
+    });
+    updateCounts();
+  }
+
+  document.querySelectorAll(".chip[data-filter]").forEach(function (c) {
+    c.addEventListener("click", function () { applyFilter(c.dataset.filter); });
+  });
+
+  var themeBtn = document.getElementById("themeBtn");
+  themeBtn.addEventListener("click", function () {
+    var root = document.documentElement;
+    var dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    var current = root.getAttribute("data-theme") || (dark ? "dark" : "light");
+    var next = current === "dark" ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    themeBtn.setAttribute("aria-pressed", String(next === "dark"));
+  });
+
+  render();
+</script>
+</body>
+</html>
