@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Add to wallet: getting Riverty’s first card to the till</title>
+<style>
+:root{
+  --bg:#07162C; --fg:#ffffff; --muted:#cbd5e1;
+  --orange:#fb923c; --cyan:#22d3ee; --teal:#34d399; --blue:#60a5fa; --violet:#a78bfa; --pink:#f472b6;
+  --eyebrow:#fdba74;
+  --card:rgba(255,255,255,0.035); --border:rgba(251,146,60,0.25);
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-snap-type:y mandatory;scroll-behavior:smooth;background:var(--bg);font-size:clamp(11px,1.05vw,17px)}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);line-height:1.4;-webkit-font-smoothing:antialiased}
+section{min-height:100vh;scroll-snap-align:start;display:flex;flex-direction:column;justify-content:center;padding:4.2vh 6vw 4.2vh 5vw;position:relative;overflow:hidden}
+section::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(60% 50% at 85% 0%,rgba(251,146,60,0.10),transparent 70%),radial-gradient(50% 50% at 0% 100%,rgba(34,211,238,0.07),transparent 70%)}
+section>*{position:relative}
+.eyebrow{font-family:var(--mono);text-transform:uppercase;letter-spacing:0.12em;color:var(--eyebrow);font-size:0.78rem;margin-bottom:0.8vh}
+h1{font-size:clamp(2rem,4.2vw,4rem);line-height:1.05;letter-spacing:-0.02em;max-width:18ch}
+h2{font-size:clamp(1.5rem,2.4vw,2.3rem);line-height:1.12;letter-spacing:-0.01em;margin-bottom:1.6vh}
+h3{font-family:var(--mono);text-transform:uppercase;letter-spacing:0.12em;font-size:0.72rem;color:var(--eyebrow);margin-bottom:0.7vh;font-weight:600}
+p,li{color:var(--muted);font-size:0.92rem}
+strong{color:var(--fg)}
+ul{list-style:none}
+li{padding-left:1.1em;position:relative;margin-bottom:0.45vh}
+li::before{content:"";position:absolute;left:0;top:0.62em;width:0.4em;height:0.4em;border-radius:50%;background:var(--accent,var(--orange))}
+.card{background:var(--card);border:1px solid var(--border);border-radius:15px;padding:1.6vh 1.4vw}
+.hero{background:linear-gradient(145deg,rgba(251,146,60,0.14),rgba(34,211,238,0.05) 70%);box-shadow:0 14px 40px rgba(0,0,0,0.38)}
+.grid{display:grid;gap:1.4vw}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g12{grid-template-columns:1.15fr 1fr}
+.mono{font-family:var(--mono)}
+.pill{display:inline-block;font-family:var(--mono);font-size:0.74rem;padding:0.4em 0.9em;border-radius:99px;border:1px solid var(--border);background:rgba(251,146,60,0.1);color:var(--fg);margin:0 0.4em 0.5vh 0}
+.pill.c{border-color:rgba(34,211,238,.4);background:rgba(34,211,238,.1)}
+.pill.t{border-color:rgba(52,211,153,.4);background:rgba(52,211,153,.1)}
+.pill.v{border-color:rgba(167,139,250,.4);background:rgba(167,139,250,.1)}
+.pill.p{border-color:rgba(244,114,182,.4);background:rgba(244,114,182,.1)}
+.callout{border-left:4px solid var(--orange);background:linear-gradient(90deg,rgba(251,146,60,0.16),rgba(251,146,60,0.03));border-radius:0 14px 14px 0;padding:1.6vh 1.4vw;box-shadow:0 10px 30px rgba(0,0,0,0.3)}
+.callout.bad{border-left-color:var(--pink);background:linear-gradient(90deg,rgba(244,114,182,0.16),rgba(244,114,182,0.03))}
+.callout p{color:var(--fg)}
+.big{font-size:1.15rem;color:var(--fg);line-height:1.35}
+.ph{border:1px dashed rgba(203,213,225,0.35);border-radius:12px;padding:1vh 1vw;color:var(--muted);font-style:italic;font-size:0.85rem}
+.tag{font-family:var(--mono);font-size:0.68rem;color:var(--cyan);letter-spacing:0.06em}
+.kv{display:grid;grid-template-columns:9.5em 1fr;gap:0.5vh 1vw;align-items:start}
+.kv dt{font-family:var(--mono);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--eyebrow);padding-top:0.15em}
+.kv dd{color:var(--muted);font-size:0.86rem}
+.kv dd strong{color:var(--fg)}
+.small p,.small li,.small dd{font-size:0.82rem}
+.journey{display:grid;grid-template-columns:repeat(7,1fr);gap:0.7vw;margin-top:1.6vh}
+.step{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.2vh 0.8vw;position:relative}
+.step .n{font-family:var(--mono);font-size:0.68rem;color:var(--eyebrow)}
+.step p{font-size:0.8rem;margin-top:0.4vh}
+.step.misery{border-color:var(--pink);background:linear-gradient(160deg,rgba(244,114,182,0.22),rgba(244,114,182,0.04));box-shadow:0 0 0 1px var(--pink),0 12px 30px rgba(244,114,182,0.2)}
+.step.misery .n{color:var(--pink)}
+.step.fix{border-color:var(--teal);background:linear-gradient(160deg,rgba(52,211,153,0.2),rgba(52,211,153,0.04))}
+.step.fix .n{color:var(--teal)}
+.col h3{display:flex;justify-content:space-between}
+.item{border:1px solid var(--border);border-radius:12px;padding:1vh 0.9vw;margin-bottom:1vh;background:rgba(7,22,44,0.55)}
+.item b{color:var(--fg);font-size:0.86rem}
+.item p{font-size:0.78rem;margin-top:0.3vh}
+.now{border-color:rgba(52,211,153,.5)} .later{border-color:rgba(96,165,250,.5)} .cut{border-color:rgba(244,114,182,.4)}
+.verdict{display:grid;grid-template-columns:repeat(3,1fr);gap:1vw;margin-top:1.4vh}
+.verdict .card{padding:1.2vh 1vw}
+.ship{border-color:rgba(52,211,153,.55)}.iter{border-color:rgba(251,146,60,.6)}.kill{border-color:rgba(244,114,182,.55)}
+.metric{font-family:var(--mono);font-size:1.7rem;color:var(--fg);line-height:1}
+.dash{display:grid;grid-template-columns:repeat(3,1fr);gap:1vw}
+.dash .card{padding:1.4vh 1vw}
+.dash p{font-size:0.8rem}
+.submit{display:inline-block;font-family:var(--mono);text-transform:uppercase;letter-spacing:0.12em;font-size:0.9rem;padding:1.3vh 2vw;border-radius:99px;background:linear-gradient(90deg,var(--orange),#f97316);color:#07162C;font-weight:700;box-shadow:0 12px 34px rgba(251,146,60,0.35)}
+a{color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(34,211,238,.4)}
+#bar{position:fixed;top:0;left:0;height:4px;width:0;background:linear-gradient(90deg,var(--orange),var(--pink));z-index:50}
+#dots{position:fixed;right:1.4vw;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:1.4vh;z-index:50}
+#dots button{width:11px;height:11px;border-radius:50%;border:1px solid var(--eyebrow);background:transparent;cursor:pointer;padding:0}
+#dots button.on{background:var(--orange);border-color:var(--orange);transform:scale(1.25)}
+#dots button:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+@media (max-width:900px){.g2,.g3,.g12,.dash,.verdict{grid-template-columns:1fr}.journey{grid-template-columns:1fr 1fr}section{padding:6vh 8vw 6vh 5vw}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div id="bar"></div>
+<nav id="dots" aria-label="Slides"></nav>
+
+<!-- 1 COVER -->
+<section id="s1" data-title="Cover">
+  <div class="eyebrow">Product School · PM Certification · Final Project · Riverty Pay &amp; Credit</div>
+  <h1>Add to wallet: getting Riverty’s first card to the till</h1>
+  <p class="big" style="max-width:46ch;margin-top:2.4vh">Give approved cardholders a one-tap path from approval to paying in-store, so Lena stops falling back to her debit card.</p>
+  <div class="grid g3" style="margin-top:5vh;max-width:78vw">
+    <div class="card hero"><h3>Name / cohort</h3><p class="big" style="font-size:1rem">Michaela Ablinger Nov 26</p></div>
+    <div class="card"><h3>Repo</h3><p style="font-size:0.8rem;word-break:break-all"><a href="https://github.com/Michaela165/pm-final-project">https://github.com/Michaela165/pm-final-project</a></p></div>
+    <div class="card"><h3>Prototype</h3><p class="mono" style="font-size:0.85rem;color:var(--fg)">04-roadmap/prototype.html</p></div>
+  </div>
+  <p class="mono" style="margin-top:3vh;font-size:0.72rem;color:var(--muted)">Practice case · fictional sample data, not Riverty research · scroll, or use ↑ ↓ Space</p>
+</section>
+
+<!-- 2 STRATEGY -->
+<section id="s2" data-title="Strategy">
+  <div class="eyebrow">Slide 5 · Strategy · Modules 1 + 3</div>
+  <h2>A slow loss of position, not a sudden crisis</h2>
+  <div class="grid g2">
+    <div class="card hero">
+      <h3>Problem hook</h3>
+      <p class="big">We must stop Lena from defaulting to rivals and her debit card by giving her one reliable, in-store-capable Riverty card that shows what she owes in a single place, so Riverty owns an everyday relationship instead of relying on whatever checkout happens to show.</p>
+      <p style="margin-top:1.4vh;font-size:0.8rem"><strong>If Riverty does nothing for 12 months:</strong> it stays dependent on merchants and on whichever option shows at checkout, while rivals build the direct consumer relationship it lacks.</p>
+    </div>
+    <div class="card">
+      <h3>Value proposition</h3>
+      <p class="big">For heavy BNPL users like Lena, an approved Riverty card that she can add to her phone wallet in one tap, so it works at the till and she no longer falls back to her debit card. Every month Riverty waits, plus the months of regulatory approval, keeps its growth dependent on whatever checkout happens to show.</p>
+    </div>
+  </div>
+  <div class="callout" style="margin-top:2vh">
+    <h3>Data-backed hypothesis</h3>
+    <p>Based on the pilot, where <strong>143 of 431 activated cards (33.2%)</strong> never reached the phone wallet (T-102) and N-03 taps a bank card in shops without thinking, I believe that an “Add to wallet” button on the approval screen will get more Lena-type users’ cards into their wallet, and so into in-store use, as measured by a <strong>+5pp absolute lift</strong> in wallet add rate versus control (my assumption). I will protect the in-store decline rate (8.7% in Month 4, boundary +2pp, my assumption) and make a single go/no-go call at a fixed read date.</p>
+  </div>
+  <p class="mono" style="margin-top:1.4vh;font-size:0.7rem;color:var(--muted)">Proven (data pack): 143 of 431, 33.2%, 8.7%. Assumed: +5pp, +2pp.</p>
+</section>
+
+<!-- 3 RESEARCH -->
+<section id="s3" data-title="Research">
+  <div class="eyebrow">Slide 6 · Research · Module 2</div>
+  <h2>Riverty becomes the thing to check, not the thing to use</h2>
+  <div class="grid g12">
+    <div class="card small">
+      <h3>Competitive analysis / workaround</h3>
+      <dl class="kv">
+        <dt>Role</dt><dd>A heavy BNPL user who already runs two or more pay later apps and checks them before payday.</dd>
+        <dt>Goal</dt><dd>See in one place what they owe in total, and when, before payday.</dd>
+        <dt>Friction</dt><dd>They can’t see what they owe on the card and on regular pay later orders together (N-07). Balances sit on two screens (T-103), and two reminders for different amounts arrive in the same week (T-104).</dd>
+        <dt>Tools used</dt><dd>Klarna, PayPal, bank app, Riverty card and pay later orders. The persona checks several apps before payday (N-02).</dd>
+        <dt>Core frustration</dt><dd>Nothing links the totals, so the user can’t trust any single number (T-103). A third app feels like more work (N-02).</dd>
+      </dl>
+    </div>
+    <div class="card small">
+      <h3>Evidence</h3>
+      <ul>
+        <li><strong>One place:</strong> the card adds a screen to the checking routine instead of replacing one.</li>
+        <li><strong>Debit fallback:</strong> when totals can’t be trusted, the safe option is the debit card, so Riverty loses everyday spending.</li>
+        <li><strong>Checkout dependence stays:</strong> no direct habit with Riverty, the brief’s core risk.</li>
+        <li><strong>Heavy users carry the risk:</strong> highest spend (EUR 320.88 monthly) and the most pay later products to track.</li>
+      </ul>
+    </div>
+  </div>
+  <h3 style="margin-top:2vh">Journey map</h3>
+  <div class="journey">
+    <div class="step"><div class="n">1</div><p>Open each pay later app (Riverty, Klarna, PayPal)</p></div>
+    <div class="step"><div class="n">2</div><p>Copy balances and due dates into a note or spreadsheet</p></div>
+    <div class="step"><div class="n">3</div><p>Check the bank app against payday</p></div>
+    <div class="step"><div class="n">4</div><p>Re-check after reminders with different amounts (T-104)</p></div>
+    <div class="step misery"><div class="n">5 · MOMENT OF MISERY</div><p><strong>Can’t trust any total</strong> (T-103, N-07)</p></div>
+    <div class="step"><div class="n">6</div><p>Falls back to the debit card (N-06)</p></div>
+    <div class="step fix"><div class="n">7 · RIVERTY INTERVENES</div><p><strong>“Add to wallet” (B2)</strong> makes the card usable at the till, so the debit card is no longer the default</p></div>
+  </div>
+  <p class="mono" style="margin-top:1.2vh;font-size:0.68rem;color:var(--muted)">Inference: the pack does not show that Lena uses a spreadsheet, notes app, screenshots or bank app (steps 2–3 assumed).</p>
+</section>
+
+<!-- 4 BLUEPRINT -->
+<section id="s4" data-title="Blueprint">
+  <div class="eyebrow">Slide 7 · Blueprint · Module 4</div>
+  <h2>Now: wallet and decline reason. Everything else waits.</h2>
+  <div class="grid g3 small">
+    <div class="col card" style="--accent:var(--teal)">
+      <h3><span>Now</span><span class="tag">this sprint</span></h3>
+      <div class="item now"><b>B1 · Decline reason and retry hint in the app</b><p>Hits the primary metric and N-06’s churn moment (T-101, 8.7% in-store declines in Month 4). Assumes decline codes are available to the app, not yet verified.</p></div>
+      <div class="item now"><b>B2 · Add to phone wallet from the approval screen</b><p>143 activated cards never reached the wallet (T-102, 66.8% baseline). No wallet means no in-store use: a precondition for the in-store pitch.</p></div>
+    </div>
+    <div class="col card">
+      <h3><span>Later</span><span class="tag">revisit</span></h3>
+      <div class="item later"><b>B5 · Partner offers in the card app</b><p>The merchant-side story (N-09), but not Lena’s friction, and needs merchant integrations. Revisit for brief Q3, not for this test.</p></div>
+    </div>
+    <div class="col card">
+      <h3><span>Cut: the “no” I’m protecting</span></h3>
+      <div class="item cut"><b>B4 · Pay now or pay later per purchase</b><p>Instalments are only 15–18% of purchases, T-105 shows confusion rather than demand, and it needs per-purchase credit decisioning plus approval.</p></div>
+      <div class="item cut"><b>B6 · Cashback on every purchase</b><p>N-12: drives a first try, not continued use. Costs margin, needs pricing approval.</p></div>
+      <div class="item cut"><b>B7 · Physical card</b><p>N-03 taps a bank card by habit. The wallet (B2) already covers tapping; a card adds production and logistics.</p></div>
+    </div>
+  </div>
+  <div class="grid g12" style="margin-top:1.6vh">
+    <div class="card hero small">
+      <h3>PRD highlights · Must-haves for “Add to phone wallet straight from the approval screen”</h3>
+      <ul>
+        <li><strong>Add to wallet button</strong> on the approval screen (Apple Pay and Google Pay), provisioned in-app, no re-entering card details.</li>
+        <li><strong>Skippable.</strong> Must never block approval or activation (approved → activated is 73.5%, already a leak).</li>
+        <li><strong>Failure state with a reason and a retry</strong>, so a silent failure doesn’t repeat the N-06 pattern.</li>
+        <li><strong>State check:</strong> hide the button if the card is already in the wallet or the device can’t take it.</li>
+        <li><strong>Funnel events:</strong> shown, tapped, started, succeeded, failed (error code), abandoned. Security and compliance baseline; PCI scope needs a check.</li>
+      </ul>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;justify-content:center">
+      <h3>Prototype</h3>
+      <p class="mono" style="color:var(--fg);font-size:1rem">04-roadmap/prototype.html</p>
+      <p style="font-size:0.75rem;margin-top:1vh">Roadmap file: bu-pay-credit-roadmap.html</p>
+    </div>
+  </div>
+</section>
+
+<!-- 5 VALIDATION -->
+<section id="s5" data-title="Validation">
+  <div class="eyebrow">Slide 8 · Validation · Module 5</div>
+  <h2>One change, one read, fixed date</h2>
+  <div class="grid g2 small">
+    <div class="card hero">
+      <h3>Hypothesis</h3>
+      <p style="color:var(--fg)">An “Add to wallet” primary button on the approval screen (FR-1 to FR-6) for Lena-type users (heavy and regular BNPL users, 25–44) will result in more cards reaching the phone wallet, and so more in-store use, as measured by a <strong>+5pp absolute change</strong> in wallet add rate within [N weeks = 2,660 activations ÷ weekly activations, minimum 2 weekly cycles].</p>
+      <h3 style="margin-top:1.4vh">Control (A) vs Variant (B)</h3>
+      <ul>
+        <li><strong>A:</strong> after approval and activation, the person adds the card to their wallet on their own. 143 of 431 activated cards (33.2%) never reached it (T-102).</li>
+        <li><strong>B:</strong> exactly one change: an “Add to phone wallet” action on the approval screen (B2). Skip never blocks approval; 3 failure reasons plus Retry; “Add later” after 3 failed retries.</li>
+        <li><strong>Unchanged in both arms:</strong> app build, eligibility and credit policy, identity check, notifications, decline messaging (B1), balance view (B3), due dates (B8). Randomised per person at approval, 50/50.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Primary metric · baseline · MDE</h3>
+      <dl class="kv">
+        <dt>Primary metric</dt><dd>Wallet add rate</dd>
+        <dt>Baseline</dt><dd><strong>66.8%</strong> activated to wallet (n=431, 4-month pilot). Pilot is mostly employees.</dd>
+        <dt>MDE</dt><dd>+5pp absolute (66.8% to 71.8%), <em>my assumption</em></dd>
+        <dt>Sample size</dt><dd>~1,330 per arm (α=0.05, 80% power, calculated by hand; check against the builder). At +10pp MDE: ~315.</dd>
+        <dt>Significance</dt><dd>p &lt; 0.05, two-sided</dd>
+        <dt>Guardrail</dt><dd>In-store decline rate, baseline <strong>8.7%</strong> (Month 4, 206 attempts). Investigate above ~10.7% (+2pp, <em>my assumption</em>). Noisy: 12.1% in Month 1, 6.4% in Month 3.</dd>
+      </dl>
+      <div class="callout bad" style="margin-top:1.2vh;padding:1vh 1vw"><p style="font-size:0.78rem"><strong>Open point:</strong> the 66.8% baseline measures activated cards to wallet, but the button sits before activation, so the eligible group changes. Measure a baseline for the new definition first.</p></div>
+    </div>
+  </div>
+  <div class="verdict small">
+    <div class="card ship"><h3 style="color:var(--teal)">Ship</h3><p>Wallet add rate improves by ≥ 5pp at p &lt; 0.05 and in-store decline rate does not reach 10.7%.</p></div>
+    <div class="card iter"><h3>Iterate</h3><p>Direction is positive but the lift is below 5pp.</p></div>
+    <div class="card kill"><h3 style="color:var(--pink)">Kill</h3><p>No improvement, or it moves negatively. The read date is fixed; no results reviewed before it.</p></div>
+  </div>
+</section>
+
+<!-- 6 LAUNCH -->
+<section id="s6" data-title="Launch">
+  <div class="eyebrow">Slide 9 · Launch · Module 6</div>
+  <h2>A release inside the launch: in-product only, tier S</h2>
+  <div class="card small">
+    <dl class="kv" style="grid-template-columns:7em 1fr">
+      <dt>Goal</dt><dd><span class="pill">Conversion</span> approved cardholders adding the card to their phone wallet, so they can pay in-store.</dd>
+      <dt>Audience</dt><dd>Heavy BNPL users in Germany (4+ orders a month) who use the Riverty app monthly and have been approved for the card: the Lena-type segment.</dd>
+      <dt>Tier</dt><dd><span class="pill c">S · minimal</span> in-product only, no channel campaign. A release, not a launch: no merchant messaging, no new channel.</dd>
+      <dt>Channels</dt><dd>
+        <span class="pill t">Owned · “Add to wallet” button (FR-1)</span>
+        <span class="pill t">Owned · Push, then email nudge, after the read date</span>
+        <span class="pill t">Owned · Wallet help article incl. credit score answer (T-107)</span>
+        <span class="pill p">Paid · none</span><span class="pill p">Earned · none planned</span>
+      </dd>
+    </dl>
+  </div>
+  <h3 style="margin-top:2vh">Success-metrics dashboard</h3>
+  <div class="dash">
+    <div class="card hero"><h3 style="color:var(--teal)">Primary</h3><div class="metric">+5pp</div><p style="margin-top:0.8vh"><strong>Wallet add rate</strong> among newly approved cardholders within [window, my assumption], vs control at p &lt; 0.05. Baseline: not yet measured for this definition.</p></div>
+    <div class="card"><h3 style="color:var(--cyan)">Secondary</h3><div class="metric">17.0%</div><p style="margin-top:0.8vh"><strong>In-store use:</strong> in-store share of purchases among wallet cards, vs the Month 4 baseline (1,107 purchases).</p></div>
+    <div class="card"><h3 style="color:var(--violet)">Guardrail</h3><div class="metric">8.7%</div><p style="margin-top:0.8vh"><strong>In-store decline rate</strong> vs control. Boundary +2pp (my assumption). Also watch approved to activated (73.5%): must not change.</p></div>
+  </div>
+  <div class="callout bad" style="margin-top:1.8vh">
+    <h3 style="color:var(--pink)">Bad signal</h3>
+    <p>Wallet add rises but in-store use stays flat. People add the card but still pay with debit (N-03), so wallet add is a vanity metric. Don’t ship on wallet add alone.</p>
+  </div>
+  <p class="mono" style="margin-top:1.2vh;font-size:0.68rem;color:var(--muted)">Most likely post-launch decision: iterate (my judgement, not a forecast). No paid spend planned; other costs unestimated. Test needs scale (~1,330 per arm); pilot had 431 activations in four months.</p>
+</section>
+
+<!-- 7 STORY -->
+<section id="s7" data-title="Story">
+  <div class="eyebrow">Slide 10 · Story · Individual insights</div>
+  <h2>The metric definition was the hard part</h2>
+  <div class="grid g2">
+    <div class="card hero">
+      <h3>Friction points &amp; the aha moment</h3>
+      <p style="color:var(--fg)">The hardest part was defining the primary metric, not the MDE. The only wallet baseline in the data pack (66.8%) measures activated cards to wallet, but my button sits on the approval screen, before activation. That changes who can add the card, so the baseline no longer matched the test. Fixing it changed my hypothesis. It also drives the baseline, sample size, isolation check and shipping rule.</p>
+      <p style="margin-top:1.4vh">A second friction: the pilot is mostly employees (N-10), and no decline or drop-off data is split by segment. My link to Lena is inference, not proof.</p>
+    </div>
+    <div class="card">
+      <h3>Key takeaways</h3>
+      <ul>
+        <li>Define the metric and its denominator before setting the MDE. Everything else depends on it.</li>
+        <li>Keep proven facts (data pack) apart from my assumptions (+5pp lift, +2pp guardrail, p &lt; 0.05).</li>
+      </ul>
+      <h3 style="margin-top:1.6vh">What I’d do next</h3>
+      <ul style="--accent:var(--teal)">
+        <li>Measure a wallet add baseline for the approval-screen definition, or move the button after activation.</li>
+        <li>Persist arm-tagged events (FR-7 is an in-memory list today).</li>
+        <li>Ask compliance whether a wallet-add flow counts as a proposition change (N-11): it gates everything.</li>
+        <li>Run the test once the card reaches volume (about 1,330 per arm).</li>
+      </ul>
+      <p class="mono" style="margin-top:1vh;font-size:0.72rem">Most likely outcome: iterate (my judgement, not a forecast).</p>
+    </div>
+  </div>
+</section>
+
+<!-- 8 THANK YOU -->
+<section id="s8" data-title="Submit" style="align-items:flex-start">
+  <div class="eyebrow">Thank you</div>
+  <h1>Thank you.</h1>
+  <p class="big" style="margin-top:2vh">Add to wallet: getting Riverty’s first card to the till</p>
+  <div class="grid g2" style="margin-top:4vh;max-width:70vw">
+    <div class="card"><h3>Repo</h3><p style="word-break:break-all"><a href="https://github.com/Michaela165/pm-final-project">https://github.com/Michaela165/pm-final-project</a></p></div>
+    <div class="card"><h3>Cohort</h3><p style="color:var(--fg)">Michaela Ablinger Nov 26</p></div>
+  </div>
+  <div style="margin-top:5vh"><span class="submit">Submit to the learning platform</span></div>
+  <p class="mono" style="margin-top:3vh;font-size:0.7rem;color:var(--muted)">Practice case · fictional sample data, not Riverty research</p>
+</section>
+
+<script>
+(function(){
+  var secs=[].slice.call(document.querySelectorAll('section'));
+  var dots=document.getElementById('dots'),bar=document.getElementById('bar');
+  secs.forEach(function(s,i){
+    var b=document.createElement('button');
+    b.setAttribute('aria-label','Go to slide '+(i+1)+': '+s.dataset.title);
+    b.title=s.dataset.title;
+    b.onclick=function(){go(i)};
+    dots.appendChild(b);
+  });
+  var btns=[].slice.call(dots.children);
+  function cur(){
+    var y=window.scrollY+window.innerHeight/2,idx=0;
+    secs.forEach(function(s,i){if(s.offsetTop<=y)idx=i});
+    return idx;
+  }
+  function go(i){
+    i=Math.max(0,Math.min(secs.length-1,i));
+    secs[i].scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  function update(){
+    var max=document.documentElement.scrollHeight-window.innerHeight;
+    bar.style.width=(max>0?window.scrollY/max*100:0)+'%';
+    var c=cur();
+    btns.forEach(function(b,i){b.classList.toggle('on',i===c)});
+  }
+  window.addEventListener('scroll',update,{passive:true});
+  window.addEventListener('resize',update);
+  document.addEventListener('keydown',function(e){
+    var k=e.key;
+    if(k==='ArrowDown'||k===' '||k==='Spacebar'){e.preventDefault();go(cur()+1)}
+    else if(k==='ArrowUp'){e.preventDefault();go(cur()-1)}
+    else if(k==='Home'){e.preventDefault();go(0)}
+    else if(k==='End'){e.preventDefault();go(secs.length-1)}
+    else if(k==='Escape'){go(0)}
+  });
+  update();
+})();
+</script>
+</body>
+</html>
